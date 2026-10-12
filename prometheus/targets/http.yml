@@ -1,0 +1,6 @@
+# Sites and APIs to check every 30 seconds. Changes are picked up automatically.
+- targets:
+    - https://gonserviceit.com.br
+    - https://example.com
+  labels:
+    team: web

@@ -1,0 +1,17 @@
+# Used while Telegram is not configured: alerts are visible in Alertmanager (http://localhost:9093)
+# and Grafana, but not sent anywhere. Set TELEGRAM_CHAT_ID in .env and the bot token in
+# secrets/telegram_bot_token to switch to telegram.yml automatically on the next start.
+route:
+  receiver: none
+  group_by: [alertname, instance]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+receivers:
+  - name: none
+
+inhibit_rules:
+  - source_matchers: [alertname="SiteDown"]
+    target_matchers: [alertname="SiteSlow"]
+    equal: [instance]

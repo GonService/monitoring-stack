@@ -1,0 +1,4 @@
+.env
+secrets/*
+!secrets/README.txt
+.DS_Store

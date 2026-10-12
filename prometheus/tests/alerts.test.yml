@@ -1,0 +1,44 @@
+# Unit tests for the alert rules: make check (promtool test rules prometheus/tests/alerts.test.yml)
+rule_files:
+  - ../rules/alerts.yml
+
+evaluation_interval: 30s
+
+tests:
+  - interval: 30s
+    input_series:
+      - series: 'probe_success{job="http", instance="https://shop.example.com"}'
+        values: "1 1 0 0 0 0 0 0"
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: SiteDown
+        exp_alerts: []
+      - eval_time: 3m30s
+        alertname: SiteDown
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: http
+              instance: https://shop.example.com
+            exp_annotations:
+              summary: "https://shop.example.com is down"
+              description: "HTTP check has been failing for more than 2 minutes."
+
+  - interval: 1m
+    input_series:
+      - series: 'node_filesystem_avail_bytes{instance="web-1", mountpoint="/", fstype="ext4"}'
+        values: "5x10"
+      - series: 'node_filesystem_size_bytes{instance="web-1", mountpoint="/", fstype="ext4"}'
+        values: "100x10"
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: DiskAlmostFull
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              instance: web-1
+              mountpoint: /
+              fstype: ext4
+            exp_annotations:
+              summary: "Less than 10% disk free on web-1 (/)"
+              description: "Only 5% left."
